@@ -13,15 +13,17 @@ Domain Path: /languages
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 global $smd_plugin_dir;
-$smd_table_name = $wpdb->prefix . "savemydates"; 	
-$smd_plugin_dir = plugins_url() . "/save-my-dates";
 global $smd_text;
 global $smd_dates;
 global $smd_arrayOfValues;
-$smd_text = "";
 
+$smd_table_name = $wpdb->prefix . "savemydates"; 	
+$smd_plugin_dir = plugins_url() . "/save-my-dates";
+$smd_text = "";
 $smd_dates = save_my_dates_getDates( $smd_text );
 $smd_arrayOfValues["marked_dates"] = $smd_dates;
+
+
 
 function save_my_date_install() {
 	global $wpdb;
@@ -45,12 +47,9 @@ register_activation_hook( __FILE__, 'save_my_date_install' );
 
 
 
-/** Step 1. */
-function save_my_date_menu() {
-	add_menu_page( 'Save My Dates options', 'My Dates', 'manage_options', 'save-my-dates', 'save_my_date_options' );
-}
 
-/** Step 3. */
+//Create the Admin menu item
+
 function save_my_date_options() {
 	if ( !current_user_can( 'manage_options' ) )  {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
@@ -59,11 +58,17 @@ function save_my_date_options() {
 	echo '</div>';
 }
 
+function save_my_date_menu() {
+	add_menu_page( 'Save My Dates options', 'My Dates', 'manage_options', 'save-my-dates', 'save_my_date_options' );
+}
+
 add_action( 'admin_menu', 'save_my_date_menu' );
 
 
+
+
 /**
- * Enqueue the date picker
+ * Enqueue the date picker plus the multi extension
  */
 function enqueue_date_picker(){
 
@@ -95,6 +100,8 @@ add_action( 'admin_enqueue_scripts', 'enqueue_date_picker' );
 
 
 
+// Create ajax control
+
 function save_my_dates_ajax_control() {
 	global $wpdb; // this is how you get access to the database
 
@@ -110,6 +117,7 @@ function save_my_dates_ajax_control() {
 add_action( 'wp_ajax_save_my_dates', 'save_my_dates_ajax_control' );
 
 
+// Retrieve dates from db
 
 function save_my_dates_getDates ($text = '') {
 	global $wpdb;
@@ -120,6 +128,9 @@ function save_my_dates_getDates ($text = '') {
 	return $results;
 
 }
+
+
+// Delete dates from db
 
 function save_my_dates_delDate ($date, $text = '') {
 	global $wpdb;
@@ -132,6 +143,9 @@ function save_my_dates_delDate ($date, $text = '') {
 	
 }
 
+
+
+// Add new dates to db
 
 function save_my_dates_addDate ($date, $text = '') {
 	global $wpdb;
